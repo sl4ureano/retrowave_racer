@@ -27,6 +27,34 @@ scene.fog=new THREE.Fog(0x3a0b45,70,430);
 let selectedMap='miami';
 let selectedCar='falcon';
 
+const IS_MOBILE = matchMedia('(pointer: coarse)').matches || innerWidth < 900;
+const RENDER_SCALE = IS_MOBILE ? 1 : Math.min(devicePixelRatio, 2);
+
+async function requestGameFullscreen(){
+  const target = document.documentElement;
+  try{
+    if(target.requestFullscreen) await target.requestFullscreen();
+    else if(target.webkitRequestFullscreen) await target.webkitRequestFullscreen();
+  }catch(e){}
+}
+
+function lockLandscape(){
+  try{
+    if(screen.orientation && screen.orientation.lock){
+      screen.orientation.lock('landscape').catch(()=>{});
+    }
+  }catch(e){}
+}
+
+function applyMobileOptimizations(){
+  if(!IS_MOBILE) return;
+  renderer.setPixelRatio(Math.min(devicePixelRatio, 1.15));
+  renderer.toneMappingExposure = 1.35;
+  scene.fog.near = 55;
+  scene.fog.far = 315;
+}
+
+
 let musicVolume=55;
 let sfxVolume=80;
 
@@ -44,14 +72,24 @@ function applySfxVolume(v){
 bindRange('musicVolume', applyMusicVolume);
 bindRange('sfxVolume', applySfxVolume);
 
+const mobileSettingsBtn = document.getElementById('mobileSettingsBtn');
+const audioMixer = document.getElementById('audioMixer');
+
+mobileSettingsBtn?.addEventListener('click', event => {
+  event.preventDefault();
+  audioMixer?.classList.toggle('open');
+});
+
+
 bindChoiceGroup('#mapChoices .choice', choice => choice.dataset.map || selectedMap, value => {
   selectedMap=value;
   setMapMusic(selectedMap,true);
 });
 
-const renderer=new THREE.WebGLRenderer({canvas,antialias:true,powerPreference:'high-performance'}); renderer.setPixelRatio(Math.min(devicePixelRatio,2)); renderer.shadowMap.enabled=false; renderer.toneMapping=THREE.ACESFilmicToneMapping; renderer.toneMappingExposure=1.65;
+const renderer=new THREE.WebGLRenderer({canvas,antialias:true,powerPreference:'high-performance'}); renderer.setPixelRatio(RENDER_SCALE); renderer.shadowMap.enabled=false; renderer.toneMapping=THREE.ACESFilmicToneMapping; renderer.toneMappingExposure=1.65;
 const camera=new THREE.PerspectiveCamera(60,innerWidth/innerHeight,.1,900); camera.position.set(0,6.2,22.5);
 bindResize(renderer, camera);
+applyMobileOptimizations();
 const hemi=new THREE.HemisphereLight(0xffb38a,0x170028,1.45); scene.add(hemi);
 const sunset=new THREE.DirectionalLight(0xff8a45,2.35); sunset.position.set(-38,28,-60); scene.add(sunset);
 const fill=new THREE.DirectionalLight(0x3defff,1.55); fill.position.set(30,18,20); scene.add(fill);
@@ -274,6 +312,8 @@ for(let z=-600,i=0;z<600;z+=32,i++){makeLamp(10.5,z+15,neonColors[(i+2)%neonColo
 const WORLD_LEN=1240;
 const worldBack=world.clone(true); worldBack.position.z=-WORLD_LEN; scene.add(worldBack);
 const worldFront=world.clone(true); worldFront.position.z=WORLD_LEN; scene.add(worldFront);
+// Mobile: manter as 3 cópias do mundo visíveis evita buracos rosa na reciclagem do cenário.
+worldBack.visible=true; worldFront.visible=true;
 const wrapWorld=createWorldWrap(world,worldBack,worldFront,WORLD_LEN);
 wrapWorld();
 
@@ -804,6 +844,10 @@ document.querySelectorAll('[data-car]').forEach(el=>el.onclick=()=>{selectedCar=
 bindMobileButtons(keys);
 
 function start(){
+  document.body.classList.add('game-running');
+  audioMixer?.classList.remove('open');
+  requestGameFullscreen();
+  lockLandscape();
   setMapMusic(selectedMap,true);resumeAudio(); playStartRev(); running=true; crashed=false; crashTimer=0; startGrace=2.2; hideMenu(menu); distance=0; const cfg=CAR_OPTIONS[selectedCar]; speed=76; nitro=100; combo=1; applySelectedCar(); player.position.x=0; world.position.z=0; wrapWorld(); rioDecor.visible=selectedMap==='rio'; rioSkyline.visible=selectedMap==='rio'; scene.fog.color.setHex(selectedMap==='rio'?0x1f3a5c:0x3a0b45); spawnRaceRivals(); enemies.forEach((e,i)=>{e.userData.lane=i%TRAFFIC_LANES.length; e.position.x=TRAFFIC_LANES[e.userData.lane]; e.position.z=-70-i*TRAFFIC_MIN_GAP*1.9; e.userData.baseSpeed=42+((i*17)%82); e.userData.targetSpeed=e.userData.baseSpeed; e.userData.speed=e.userData.baseSpeed}); enforceTrafficSpacing(); statusEl.textContent=(selectedMap==='rio'?'Rio de Janeiro':'Miami Ocean Drive')+' • '+cfg.name+' • Você começa em 7º'; setRaceHud(7)}
 
 // Colisão v22: hitbox justa e consistente para todos os carros.
@@ -867,7 +911,8 @@ function carSweptHit(obj,prevZ){
 function showCrashMenu(){
   running=false;
   statusEl.textContent='Batida! Enter para reiniciar';
-  showMenu(menu);
+  document.body.classList.remove('game-running');
+    showMenu(menu);
   document.querySelector('.subtitle').textContent='Você bateu em um carro. Hitbox ajustada: não acusa passando do lado e não deixa atravessar modelos sem colisão.';
   document.getElementById('start').textContent='Correr de novo';
 }

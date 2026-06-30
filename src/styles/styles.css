@@ -639,3 +639,488 @@ html,body {
   grid-template-columns:54px 1fr 32px
 }
 }
+
+
+
+/* Mobile controls melhorados */
+#mobile {
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: none;
+}
+
+@media(max-width:900px), (pointer:coarse) {
+  body {
+    overscroll-behavior: none;
+  }
+
+  #mobile {
+    display: flex !important;
+    padding: max(12px, env(safe-area-inset-bottom)) 16px 16px;
+  }
+
+  .mBtn {
+    width: 78px;
+    height: 78px;
+    font-size: 22px;
+  }
+
+  .mBtn.wide {
+    width: 112px;
+    height: 78px;
+    font-size: 15px;
+  }
+
+  .pad {
+    gap: 14px;
+  }
+
+  .actions {
+    gap: 12px;
+  }
+
+  .hud {
+    transform: scale(.86);
+    transform-origin: top left;
+  }
+
+  .audioMixer {
+    transform: scale(.86);
+    transform-origin: top right;
+  }
+}
+
+@media(max-height:480px) and (orientation:landscape) {
+  .center .card {
+    transform: scale(.86);
+  }
+
+  .mBtn {
+    width: 68px;
+    height: 68px;
+  }
+
+  .mBtn.wide {
+    width: 96px;
+    height: 68px;
+  }
+}
+
+
+
+
+
+
+/* Mobile UI v3: controles responsivos sem sobreposição */
+@media(max-width:900px), (pointer:coarse) {
+  /* No menu, controles ficam escondidos para não cobrir seleção de carro/mapa */
+  body:not(.game-running) #mobile {
+    display: none !important;
+  }
+
+  body.game-running #mobile {
+    display: block !important;
+    position: fixed;
+    inset: 0;
+    padding: 0;
+    pointer-events: none;
+    z-index: 20;
+  }
+
+  body.game-running #mobile .pad,
+  body.game-running #mobile .actions {
+    pointer-events: none;
+  }
+
+  body.game-running #mobile .mBtn {
+    pointer-events: auto;
+  }
+
+  /* Direção: lado esquerdo, dois botões lado a lado */
+  body.game-running #mobile .pad {
+    position: fixed;
+    left: max(12px, env(safe-area-inset-left));
+    bottom: calc(14px + env(safe-area-inset-bottom));
+    width: min(42vw, 176px);
+    height: clamp(58px, 13vw, 76px);
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+
+  /* Ações: lado direito, freio e nitro embaixo, acelerar acima */
+  body.game-running #mobile .actions {
+    position: fixed;
+    right: max(12px, env(safe-area-inset-right));
+    bottom: calc(14px + env(safe-area-inset-bottom));
+    display: grid;
+    grid-template-columns: clamp(70px, 19vw, 94px) clamp(82px, 23vw, 112px);
+    grid-template-rows: clamp(58px, 13vw, 76px);
+    gap: 10px;
+    align-items: end;
+  }
+
+  body.game-running .mBtn {
+    width: 100% !important;
+    height: clamp(58px, 13vw, 76px) !important;
+    min-width: 0 !important;
+    border-radius: 24px !important;
+    font-size: clamp(18px, 5vw, 26px) !important;
+  }
+
+  body.game-running .actions .mBtn[data-key="ArrowDown"] {
+    grid-column: 1;
+    grid-row: 1;
+    font-size: clamp(15px, 4.2vw, 19px) !important;
+  }
+
+  body.game-running .actions .mBtn[data-key="Space"] {
+    grid-column: 2;
+    grid-row: 1;
+    width: 100% !important;
+    font-size: clamp(14px, 4vw, 17px) !important;
+  }
+
+  body.game-running .actions .mBtn[data-key="ArrowUp"] {
+    position: fixed !important;
+    right: max(18px, env(safe-area-inset-right));
+    bottom: calc(clamp(84px, 22vw, 108px) + env(safe-area-inset-bottom));
+    width: clamp(60px, 16vw, 78px) !important;
+    height: clamp(60px, 16vw, 78px) !important;
+    border-radius: 50% !important;
+    font-size: 0 !important;
+  }
+
+  body.game-running .actions .mBtn[data-key="ArrowUp"]::after {
+    content: "GO";
+    font-size: clamp(14px, 4vw, 18px);
+    font-weight: 1000;
+  }
+
+  /* Menu rolável no mobile, sem controles por cima */
+  body:not(.game-running) .center {
+    align-items: flex-start;
+    overflow-y: auto;
+    padding: 16px 10px 26px;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  body:not(.game-running) .card {
+    margin: 0 auto;
+    max-height: none;
+    width: min(94vw, 520px);
+    padding: 20px 16px;
+  }
+
+  body:not(.game-running) .logo {
+    font-size: clamp(34px, 11vw, 54px);
+  }
+
+  body:not(.game-running) .miniCarWrap {
+    height: 86px;
+  }
+
+  /* Engrenagem continua visível, mas mixer não abre em cima do menu acidentalmente */
+  body:not(.game-running) .audioMixer {
+    top: 76px !important;
+  }
+
+  .mobileSettingsBtn {
+    width: 48px !important;
+    height: 48px !important;
+    font-size: 23px !important;
+  }
+
+  .hud {
+    transform: scale(.70) !important;
+    transform-origin: top left !important;
+  }
+
+  .positionHud {
+    top: 12px !important;
+    transform: translateX(-50%) scale(.76) !important;
+  }
+}
+
+/* Telas muito estreitas: empilha menos e dá mais espaço ao carro */
+@media(max-width:390px) and (pointer:coarse) {
+  body.game-running #mobile .pad {
+    width: 148px;
+    gap: 8px;
+  }
+
+  body.game-running #mobile .actions {
+    grid-template-columns: 70px 88px;
+    gap: 8px;
+  }
+
+  body.game-running .mBtn {
+    border-radius: 22px !important;
+  }
+}
+
+/* Landscape mobile: controles menores e afastados */
+@media(max-height:520px) and (orientation:landscape) and (pointer:coarse) {
+  body.game-running #mobile .pad {
+    width: 150px;
+    height: 58px;
+  }
+
+  body.game-running #mobile .actions {
+    grid-template-columns: 74px 96px;
+  }
+
+  body.game-running .mBtn {
+    height: 58px !important;
+  }
+
+  body.game-running .actions .mBtn[data-key="ArrowUp"] {
+    width: 58px !important;
+    height: 58px !important;
+    bottom: calc(80px + env(safe-area-inset-bottom));
+  }
+}
+
+
+
+/* Audio card fix v4 */
+@media(max-width:900px), (pointer:coarse) {
+  .audioMixer {
+    position: fixed !important;
+    width: min(82vw, 300px) !important;
+    max-width: 300px !important;
+    height: auto !important;
+    min-height: 0 !important;
+    padding: 12px !important;
+    border-radius: 18px !important;
+    opacity: 0 !important;
+    pointer-events: none !important;
+    transform: translateY(-8px) scale(.96) !important;
+    transition: .16s opacity, .16s transform !important;
+    z-index: 30 !important;
+    overflow: hidden !important;
+  }
+
+  .audioMixer.open {
+    opacity: 1 !important;
+    pointer-events: auto !important;
+    transform: translateY(0) scale(1) !important;
+  }
+
+  body:not(.game-running) .audioMixer {
+    left: 50% !important;
+    right: auto !important;
+    top: 88px !important;
+    bottom: auto !important;
+    transform: translate(-50%, -8px) scale(.96) !important;
+  }
+
+  body:not(.game-running) .audioMixer.open {
+    transform: translate(-50%, 0) scale(1) !important;
+  }
+
+  body.game-running .audioMixer {
+    left: auto !important;
+    right: 12px !important;
+    top: auto !important;
+    bottom: calc(110px + env(safe-area-inset-bottom)) !important;
+    width: min(58vw, 230px) !important;
+    transform: translateY(8px) scale(.94) !important;
+  }
+
+  body.game-running .audioMixer.open {
+    transform: translateY(0) scale(.94) !important;
+  }
+
+  .audioMixer label {
+    grid-template-columns: 58px 1fr 34px !important;
+    gap: 8px !important;
+    margin: 7px 0 !important;
+  }
+
+  .audioMixer input[type=range] {
+    min-width: 0 !important;
+  }
+
+  .audioMixer .mixTitle {
+    margin-bottom: 6px !important;
+  }
+
+  .mobileSettingsBtn {
+    z-index: 31 !important;
+  }
+}
+
+@media(max-width:390px) and (pointer:coarse) {
+  body.game-running .audioMixer {
+    width: 210px !important;
+    right: 8px !important;
+    bottom: calc(104px + env(safe-area-inset-bottom)) !important;
+  }
+
+  body:not(.game-running) .audioMixer {
+    width: 280px !important;
+  }
+}
+
+
+
+/* Mobile UI v4: GO no botão principal + HUD organizado */
+@media(max-width:900px), (pointer:coarse) {
+  body.game-running #mobile .actions {
+    right: max(12px, env(safe-area-inset-right)) !important;
+    bottom: calc(14px + env(safe-area-inset-bottom)) !important;
+    display: grid !important;
+    grid-template-columns: clamp(72px, 19vw, 94px) clamp(92px, 24vw, 118px) !important;
+    grid-template-rows: clamp(60px, 14vw, 78px) !important;
+    gap: 10px !important;
+  }
+
+  /* Freio continua no meio/direita, menor */
+  body.game-running .actions .mBtn[data-key="ArrowDown"] {
+    grid-column: 1 !important;
+    grid-row: 1 !important;
+    position: static !important;
+    width: 100% !important;
+    height: clamp(60px, 14vw, 78px) !important;
+    border-radius: 24px !important;
+    font-size: clamp(15px, 4.2vw, 19px) !important;
+  }
+
+  /* GO agora é o botão grande principal embaixo à direita */
+  body.game-running .actions .mBtn[data-key="ArrowUp"] {
+    grid-column: 2 !important;
+    grid-row: 1 !important;
+    position: static !important;
+    width: 100% !important;
+    height: clamp(60px, 14vw, 78px) !important;
+    border-radius: 24px !important;
+    font-size: 0 !important;
+    color: #070018 !important;
+    background: linear-gradient(135deg, #41ff9f, #fff, #2dfcff) !important;
+    font-weight: 1000 !important;
+  }
+
+  body.game-running .actions .mBtn[data-key="ArrowUp"]::after {
+    content: "GO";
+    font-size: clamp(18px, 5vw, 24px);
+    font-weight: 1000;
+  }
+
+  /* Nitro sobe e vira botão circular menor, fácil de acionar quando precisar */
+  body.game-running .actions .mBtn[data-key="Space"] {
+    position: fixed !important;
+    right: max(18px, env(safe-area-inset-right)) !important;
+    bottom: calc(clamp(88px, 23vw, 116px) + env(safe-area-inset-bottom)) !important;
+    width: clamp(58px, 16vw, 78px) !important;
+    height: clamp(58px, 16vw, 78px) !important;
+    border-radius: 50% !important;
+    font-size: 0 !important;
+    color: #070018 !important;
+    background: linear-gradient(135deg, var(--pink), #fff, var(--cyan)) !important;
+  }
+
+  body.game-running .actions .mBtn[data-key="Space"]::after {
+    content: "N2O";
+    font-size: clamp(13px, 3.8vw, 17px);
+    font-weight: 1000;
+  }
+
+  /* HUD superior mais discreto e sem trepar */
+  body.game-running .hud {
+    display: block !important;
+    padding: 8px !important;
+    transform: none !important;
+    pointer-events: none;
+  }
+
+  body.game-running .hud .panel:first-child {
+    position: fixed !important;
+    left: 8px !important;
+    top: 8px !important;
+    width: 136px !important;
+    padding: 8px 9px !important;
+    border-radius: 14px !important;
+    background: rgba(10,8,28,.46) !important;
+    backdrop-filter: blur(6px) !important;
+  }
+
+  body.game-running .hud .title {
+    font-size: 9px !important;
+    letter-spacing: .12em !important;
+  }
+
+  body.game-running .hud .big {
+    font-size: 18px !important;
+    margin-top: 4px !important;
+  }
+
+  body.game-running .hud .row {
+    display: grid !important;
+    grid-template-columns: 1fr 1fr !important;
+    gap: 4px !important;
+    margin-top: 6px !important;
+  }
+
+  body.game-running .hud .pill {
+    font-size: 9px !important;
+    padding: 4px 5px !important;
+    text-align: center !important;
+  }
+
+  body.game-running .hud .row .pill:nth-child(3) {
+    display: none !important;
+  }
+
+  body.game-running .hud .small {
+    display: none !important;
+  }
+
+  body.game-running .rightPanel {
+    display: none !important;
+  }
+
+  body.game-running .positionHud {
+    top: 8px !important;
+    left: auto !important;
+    right: 8px !important;
+    transform: none !important;
+    width: 116px !important;
+    padding: 8px 9px !important;
+    border-radius: 14px !important;
+    background: rgba(10,8,28,.46) !important;
+    backdrop-filter: blur(6px) !important;
+  }
+
+  body.game-running .positionHud .label {
+    font-size: 9px !important;
+    letter-spacing: .14em !important;
+  }
+
+  body.game-running .positionHud .value {
+    font-size: 20px !important;
+    margin-top: 3px !important;
+  }
+
+  body.game-running .positionHud .names {
+    display: none !important;
+  }
+}
+
+@media(max-width:390px) and (pointer:coarse) {
+  body.game-running .hud .panel:first-child {
+    width: 124px !important;
+  }
+
+  body.game-running .positionHud {
+    width: 104px !important;
+  }
+
+  body.game-running .hud .big {
+    font-size: 16px !important;
+  }
+
+  body.game-running .positionHud .value {
+    font-size: 18px !important;
+  }
+}

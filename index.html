@@ -2,7 +2,8 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <meta name="theme-color" content="#070018" />
   <title>Retrowave Racer</title>
   <link rel="stylesheet" href="./src/styles/styles.css" />
 </head>
@@ -18,9 +19,10 @@
   <label>🎵 Música <input id="musicVolume" type="range" min="0" max="100" value="55"><span class="mixValue" id="musicVolLabel">55%</span></label>
   <label>🔊 Jogo <input id="sfxVolume" type="range" min="0" max="100" value="80"><span class="mixValue" id="sfxVolLabel">80%</span></label>
 </div>
+<button id="mobileSettingsBtn" class="mobileSettingsBtn" aria-label="Configurações">⚙</button>
 
 <div class="positionHud"><div class="label">POSIÇÃO</div><div class="value" id="positionBig">7º / 7</div><div class="names" id="rankingNames">Largada: 6 rivais à frente</div></div>
-<div class="center" id="menu"><div class="card"><div class="logo">Retrowave<br/>Racer</div><div class="subtitle" id="menuSubtitle">Escolha o mapa e o carro antes de largar. Você começa em 7º e precisa ultrapassar os 6 rivais pelo caminho.</div>
+<div class="center" id="menu"><div class="card"><div class="logo">Retrowave<br/>Racer</div><div class="subtitle" id="menuSubtitle">Escolha o mapa e o carro antes de largar. No celular, o jogo entra em fullscreen e mostra controles touch.</div>
   <div class="selectTitle">Mapa</div>
   <div class="choiceGrid mapGrid" id="mapChoices">
     <div class="choice active" data-map="miami"><b>Miami Ocean Drive</b><span>Pôr do sol, neon, praia, hotéis art déco e marina.</span></div>
@@ -33,7 +35,7 @@
     <div class="choice" data-car="turbo"><div class="miniCarWrap"><div class="miniCar miniTurbo"><i class="cab"></i><i class="wing"></i><i class="nose"></i></div></div><b>Turbo X</b><span>Controle melhor e curvas fáceis. Controle ★★★★★</span></div>
   </div>
   <button id="start" class="btn">Começar corrida</button><div class="keys"><div class="key">A/D ou ←/→<br/>Direção</div><div class="key">W ou ↑<br/>Acelerar</div><div class="key">S ou ↓<br/>Frear</div><div class="key">Espaço<br/>Nitro</div></div></div></div>
-<div id="mobile"><div class="pad"><button class="mBtn" data-key="ArrowLeft">←</button><button class="mBtn" data-key="ArrowRight">→</button></div><div class="actions"><button class="mBtn" data-key="ArrowDown">BRAKE</button><button class="mBtn wide" data-key="Space">NITRO</button><button class="mBtn" data-key="ArrowUp">GO</button></div></div>
+<div id="mobile"><div class="pad"><button class="mBtn" data-key="ArrowLeft">←</button><button class="mBtn" data-key="ArrowRight">→</button></div><div class="actions"><button class="mBtn" data-key="ArrowDown">FREIO</button><button class="mBtn wide" data-key="Space">NITRO</button><button class="mBtn" data-key="ArrowUp">GO</button></div></div>
 
 <script type="module" src="./src/main.js"></script>
 </body>
