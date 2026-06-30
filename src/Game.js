@@ -1,16 +1,14 @@
 import * as THREE from 'https://unpkg.com/three@0.160.0/build/three.module.js';
 import { updateVolumeLabel, bindRange } from './ui/AudioPanel.js';
-import { youtubeWatchToId, youtubeEmbedUrl } from './utils/youtube.js';
+import { setMapMusic, setMusicVolume } from './audio/LocalMusic.js';
 import { mat, basic, neon, box, cyl, sphere } from './core/meshFactory.js';
 import { bindResize } from './core/resize.js';
-import { sendYouTubeCommand } from './audio/MusicPlayer.js';
 import { createKeyState, bindKeyboard, bindMobileButtons } from './core/Input.js';
 import { bindChoiceGroup, hideMenu, showMenu } from './ui/Menu.js';
 import { updateRaceHud } from './ui/RaceHud.js';
 import { createWorldWrap } from './world/WorldWrap.js';
 import { calculatePlayerPosition } from './race/Ranking.js';
 
-import { YOUTUBE_TRACKS } from './config/music.js';
 
 import { CAR_OPTIONS } from './config/cars.js';
 
@@ -29,61 +27,13 @@ scene.fog=new THREE.Fog(0x3a0b45,70,430);
 let selectedMap='miami';
 let selectedCar='falcon';
 
-let currentMusicMap=null;
-let ytPlayer=null;
-let ytReady=false;
-let pendingMusicMap=null;
 let musicVolume=55;
 let sfxVolume=80;
 
-window.onYouTubeIframeAPIReady=function(){
-  ytPlayer=new YT.Player('ytMusic',{
-    height:'135',
-    width:'240',
-    videoId:YOUTUBE_TRACKS[selectedMap]||YOUTUBE_TRACKS.miami,
-    playerVars:{autoplay:0,controls:1,loop:1,playlist:YOUTUBE_TRACKS[selectedMap]||YOUTUBE_TRACKS.miami,playsinline:1,rel:0},
-    events:{
-      onReady:()=>{
-        ytReady=true;
-        ytPlayer.setVolume(musicVolume);
-        sendYouTubeCommand('setVolume',[musicVolume]);
-        if(pendingMusicMap) setMapMusic(pendingMusicMap,true);
-      }
-    }
-  });
-};
-
-function setMapMusic(map, force=false){
-  const id=youtubeWatchToId(YOUTUBE_TRACKS[map]||YOUTUBE_TRACKS.miami);
-  if(!force && currentMusicMap===map) return;
-  currentMusicMap=map;
-  pendingMusicMap=map;
-  if(ytReady && ytPlayer && ytPlayer.loadVideoById){
-    ytPlayer.loadVideoById({videoId:id,startSeconds:0});
-    ytPlayer.setVolume(musicVolume);
-    sendYouTubeCommand('setVolume',[musicVolume]);
-    ytPlayer.playVideo();
-  }else{
-    const frame=document.getElementById('ytMusic');
-    if(frame) frame.src=youtubeEmbedUrl(id);
-    setTimeout(()=>applyMusicVolume(musicVolume),900);
-  }
-}
-
 function applyMusicVolume(v){
-  musicVolume=Number(v);
+  musicVolume = Number(v);
   updateVolumeLabel('musicVolLabel', musicVolume);
-
-  // Caminho 1: YouTube IFrame API, quando está pronta.
-  if(ytReady && ytPlayer && ytPlayer.setVolume){
-    try{ ytPlayer.setVolume(musicVolume); }catch(e){}
-  }
-
-  // Caminho 2: fallback direto via postMessage para o iframe.
-  // Isso faz o slider funcionar mesmo quando o player foi carregado por src/embed.
-  sendYouTubeCommand('setVolume',[musicVolume]);
-  if(musicVolume===0) sendYouTubeCommand('mute');
-  else sendYouTubeCommand('unMute');
+  setMusicVolume(musicVolume);
 }
 
 function applySfxVolume(v){
