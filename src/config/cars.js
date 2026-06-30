@@ -1,0 +1,1 @@
+export const CAR_OPTIONS={falcon:{name:'Falcon GT',color:0xff185f,scale:[1.08,.96,1.10],max:196,accel:96,handling:1.00},neon:{name:'Neon V12',color:0x7c3cff,scale:[1.16,.82,1.18],max:188,accel:112,handling:1.08},turbo:{name:'Turbo X',color:0x21e6ff,scale:[.98,1.02,.96],max:178,accel:102,handling:1.22}};
